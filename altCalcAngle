@@ -1,0 +1,179 @@
+import math
+import matplotlib.patches as patches
+import pylab
+import numpy as np
+from qgis.core import *
+from collections import defaultdict
+
+#layer =  QgsVectorLayer("C:\Utilisateurs\16116\Bureau\angles\source\SELECTIONsmall.shp", "selection", "ogr") 
+layer = qgis.utils.iface.activeLayer()
+iter = layer.getFeatures()
+dict = {}
+type(layer)
+
+#iterate over features
+for feature in iter:
+ 
+    #print feature.id()
+    geom = feature.geometry()
+    coord = geom.asPolyline()
+
+# Get Number of Nodes in the Polyline
+    j= "Points in Poly=%d" %(len(coord))
+
+### GET FIRST AND LAST POINTS OF POLY + N ORIENTATION###
+# Get Objective Orientation
+    d=QgsDistanceArea()
+    d.setEllipsoidalMode(True)
+    points=geom.asPolyline()
+
+    #second way to get Endpoints
+    if not points :
+        pass
+    else:
+        first = points[0]
+        last = points[-1]
+        r=d.bearing(first, last)
+        b= "NorthOrientation= %s" %(math.degrees(r))
+
+#Assemble Features
+        dict[feature.id() ]= [first, last]
+
+### KEY = INTERSECTION, VALUES = COMMONPOINTS###
+dictionary = {}
+a = dict
+for i in a:
+        for j in a:
+            c = set(a[i]).intersection(set(a[j]))
+            if len(c) == 1:
+                d = set(a[i]).difference(c)
+                c = list(c)[0]
+                if not d:
+                    pass
+                else:
+                    value = list(d)[0]
+                if c in dictionary and value not in dictionary[c]:
+                    dictionary[c].append(value)
+                elif c not in dictionary:
+                    dictionary.setdefault(c, [])
+                    dictionary[c].append(value)
+
+            else: pass
+
+#print dictionary
+
+values = dictionary.values()
+
+
+### SORT USING POLAR COORDINATES ###
+#print values
+newlist = []
+for list in values:
+ 
+    pp = list
+# compute centroid
+    cent=(sum([p[0] for p in pp])/len(pp),sum([p[1] for p in pp])/len(pp))
+# sort by polar angle
+    pp.sort(key=lambda p: math.atan2(p[1]-cent[1],p[0]-cent[0]))
+# plot points
+    pylab.scatter([p[0] for p in pp],[p[1] for p in pp])
+# plot polyline
+    #pylab.gca().add_patch(patches.Polygon(pp,closed=False,fill=False))
+    
+    newlist.append(pp)
+
+###AJOUT first en last NE FONCTIONNE QU'UNE FOIS !!! ###
+#print newlist
+for list in newlist : 
+    if list[0] != list[-1]:
+        list.append(list[0])
+    elif list[0] == list[-1]:
+        pass
+#print dictionary
+
+
+### SETTING LOCAL COORDINATES ###
+
+zlist=[]
+newdict={}
+for key, values in dictionary.iteritems():
+    xlist =[]
+    ylist = []
+    i=0
+    #print key
+    #print key[0]
+    for sides in values:
+
+        A = dictionary[key][i][0]
+        B = key[0]
+        C = dictionary[key][i][1]
+        D= key[1]
+        E = (0.0, 0.0)
+        
+        o1 = A-B
+        o2  = C-D
+        
+        xlist.append(o1)
+        ylist.append(o2)
+        ziplist = zip(xlist, ylist)
+        i+=1
+    zlist.append(ziplist)  
+
+    #print dict[key][i][0]
+
+newdict=zlist
+#print newdict
+
+
+### ### CALCULATING ANGLES###
+def angle_between(p1, p2):
+    ang1 = np.arctan2(*p1[::-1])
+    ang2 = np.arctan2(*p2[::-1])
+    return np.rad2deg((ang1 - ang2) % (2 * np.pi))
+
+
+
+#f = open('results.txt', 'w')
+#s = str(fullang)
+#f.write(fullang)
+def euclidean_distance(point1,point2):
+    return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
+
+fullang=[]
+fulllen=[]
+for p in newdict:
+    i=0
+    j=1
+    anglist = []
+    lenlist=[]
+#    print "p=",p
+    for q in p[:-1]:
+        A=p[i]
+        B=p[j]
+#        print "A=",A
+#        print "B=", B
+#        print "angle=", angle_between(B,A)
+
+        anglist.append(angle_between(B,A))
+        lenlist.append(euclidean_distance(QgsPoint(float(A[0]), float(A[1])),QgsPoint(0,0)))
+
+        i+=1
+        j+=1
+    fullang.append(anglist)
+    fulllen.append(lenlist)
+
+angdict ={}
+lendict={}
+i=0
+for key in dictionary.iterkeys():
+    
+    angdict[key]=fullang[i]
+    lendict[key]=fulllen[i]
+    i+=1
+    
+dd = [dictionary, angdict, lendict]
+
+d={}
+for k in angdict.iterkeys():
+    d[k] = tuple(d[k] for d in dd)
+print d
