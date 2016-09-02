@@ -77,3 +77,58 @@ def addzeros(lst, max):
 print "uni2int", uniToInt(iter)
 #print longest(uniToInt(iter))
 #print addzeros(uniToInt(iter), longest(uniToInt(iter)))
+
+
+#****************************************************************#
+
+#second way
+
+layer = qgis.utils.iface.activeLayer()
+iter = layer.getFeatures()
+result = []
+
+unilist=[]
+for feature in iter:
+    print "Features ID: %d" % feature.id()
+    attrs= feature.attributes()
+#    print "attrs", attrs
+
+    
+    for strings in attrs:
+        print "strings:", type(strings),strings
+        unilist.append(strings.split(','))
+#    print "atr", attrs
+
+#print unilist
+
+for uni in unilist:
+        intlist =[]
+        for txt in uni:
+            intlist.append(float(txt))
+        print "intlist",intlist
+        result.append(intlist)
+print result
+
+
+'''
+listOfLists = [[1,2,3,4], [1,2,3], [1,2,3,4,5]]
+
+def longest(lst):
+    if type(lst) is not list:
+        return 0
+    max = len(lst)
+    for i in lst:
+        max_i = longest(i)
+        if max_i > max:
+            max = max_i
+    return max
+
+print longest(listOfLists)
+
+def addzeros(lst, max):
+    for l in lst:
+        while len(l)< max:
+            l.append(0.0)
+    return lst
+print addzeros(listOfLists, longest(listOfLists))
+'''
