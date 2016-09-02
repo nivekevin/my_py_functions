@@ -94,4 +94,21 @@ def getCoordandBearing(self, iter)
       b= "NorthOrientation= %s" %(math.degrees(r))
   #Assemble Features
       dict[feature.id() ]= [ j, first, last, b]
-      
+
+#***************************************************************#
+
+
+# Get Lengths
+
+
+def euclidean_distance(point1,point2):
+    return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
+distance=[]    
+for key, value in d.iteritems():
+    i = 0
+    j=1
+    a = QgsPoint(value[0][i])
+    b = QgsPoint(value[0][j])
+    distance.append(euclidean_distance(a,b))
+print len(distance)
+print len(d)
