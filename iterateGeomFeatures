@@ -1,0 +1,97 @@
+
+layer = qgis.utils.iface.activeLayer()
+iter = layer.getFeatures()
+
+
+//**********************************************//
+
+def retrievePoints(self, iter):
+  for feature in iter:
+# retrieve every feature with its geometry and attributes
+# fetch attributes
+    attrs = feature.attributes()
+# attrs is a list. It contains all the attribute values of this feature
+    print attrs
+
+  # fetch geometry
+      geom = feature.geometry()
+      print "Feature ID %d: " % feature.id()
+  # show number of points coposing the feature
+      if geom.type() == QGis.Point:
+          x = geom.asPoint()
+          return "Point: " + str(x)
+      elif geom.type() == QGis.Line:
+          x = geom.asPolyline()
+          return "Line: %d points" % len(x)
+      elif geom.type() == QGis.Polygon:
+          x = geom.asPolygon()
+          numPts = 0
+          for ring in x:
+              numPts += len(ring)
+          return "Polygon: %d rings with %d points" % (len(x), numPts)
+      else:
+          print "Unknown"
+
+
+//**********************************************//
+
+# get coordinates of a polyline
+import math
+def polylineCoords(self, iter):
+  dict = {}
+  for feature in iter:
+      print feature.id()
+      geom = feature.geometry()
+      coord = geom.asPolyline()
+      dict[feature.id() ]= [coord]
+  print dict
+  print len(dict) 
+
+
+//**********************************************//
+
+#get bearing -- orientation relative to North Pole
+
+def getBearing(self, iter):
+  dict = {}
+  for feature in iter:
+      geom = feature.geometry()
+      coord = geom.asPolyline()
+      d=QgsDistanceArea()
+      d.setEllipsoidalMode(True)
+      coord=geom.asPolyline()
+      first = coord[0]
+      last = coord[-1]
+      r=d.bearing(first, last)
+      b=math.degrees(r)
+      print b
+
+//**********************************************//
+
+# these three functions assembled
+
+def getCoordandBearing(self, iter)
+  dict = {}
+  #iterate over features
+  for feature in iter:
+   
+      #print feature.id()
+      geom = feature.geometry()
+      coord = geom.asPolyline()
+      
+  # Get Number of Nodes in the Polyline
+      j= "Points in Poly=%d" %(len(coord))
+  
+  # Get Objective Orientation
+      d=QgsDistanceArea()
+      d.setEllipsoidalMode(True)
+      points=geom.asPolyline()
+      #second way to get Endpoints
+      first = points[0]
+      last = points[-1]
+      coord = [first, last]
+      r=d.bearing(first, last)
+      b= "NorthOrientation= %s" %(math.degrees(r))
+  #Assemble Features
+      dict[feature.id() ]= [ j, first, last, b]
+      
