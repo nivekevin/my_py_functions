@@ -1,0 +1,56 @@
+def line_intersection(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+       return Exception('lines do not intersect')
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return x, y
+
+def poly_intersection(poly1, poly2):
+
+    for i, p1_first_point in enumerate(poly1[:-1]):
+        p1_second_point = poly1[i + 1]
+
+        for j, p2_first_point in enumerate(poly2[:-1]):
+            p2_second_point = poly2[j + 1]
+
+            if line_intersection((p1_first_point, p1_second_point), (p2_first_point, p2_second_point)):
+                return True
+
+    return False
+
+#example
+
+#PL1 = ((-1, -1), (1, -1), (1, 2))
+#PL2 = ((0, 1), (2, 1))
+
+#print poly_intersection(PL1, PL2)
+
+//##################################################################//
+
+from __future__ import division 
+
+def line(p1, p2):
+    A = (p1[1] - p2[1])
+    B = (p2[0] - p1[0])
+    C = (p1[0]*p2[1] - p2[0]*p1[1])
+    return A, B, -C
+
+def intersection(L1, L2):
+    D  = L1[0] * L2[1] - L1[1] * L2[0]
+    Dx = L1[2] * L2[1] - L1[1] * L2[2]
+    Dy = L1[0] * L2[2] - L1[2] * L2[0]
+    if D != 0:
+        x = Dx / D
+        y = Dy / D
+        return x,y
+    else:
+        return False
