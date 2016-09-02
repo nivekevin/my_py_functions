@@ -3,7 +3,8 @@ layer = qgis.utils.iface.activeLayer()
 iter = layer.getFeatures()
 
 
-//**********************************************//
+
+#***************************************************************#
 
 def retrievePoints(self, iter):
   for feature in iter:
@@ -33,7 +34,8 @@ def retrievePoints(self, iter):
           print "Unknown"
 
 
-//**********************************************//
+
+#***************************************************************#
 
 # get coordinates of a polyline
 import math
@@ -48,7 +50,9 @@ def polylineCoords(self, iter):
   print len(dict) 
 
 
-//**********************************************//
+
+
+#***************************************************************#
 
 #get bearing -- orientation relative to North Pole
 
@@ -66,7 +70,10 @@ def getBearing(self, iter):
       b=math.degrees(r)
       print b
 
-//**********************************************//
+
+
+#***************************************************************#
+
 
 # these three functions assembled
 
