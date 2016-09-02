@@ -1,0 +1,79 @@
+# creates an array according to longest set of values
+
+# may create an array with many many zeros
+
+layer = qgis.utils.iface.activeLayer()
+iter = layer.getFeatures()
+
+
+def uniToInt(iter):
+    unilist=[]
+    result = []
+    for feature in iter:
+#        print "Features ID: %d" % feature.id(), feature
+        attrs= feature.attributes()
+#        print "attrs", attrs
+        oneAngle =[]
+        for strings in attrs:
+#            print "strings:", strings
+            oneAngle.append(strings.split(','))
+        unilist.append(oneAngle)
+    #    print "atr", attrs
+    
+#    print "UNI", unilist
+    for oneAngle in unilist:
+        series = []
+#        print 'one angle', oneAngle
+        for uni in oneAngle:
+            intlist =[]
+            
+            for txt in uni:
+                intlist.append(float(txt))
+#            print "intlist",intlist
+            series.append(intlist)
+#        print "series", series
+        result.append(series)
+#    print "Uni2Int RESULT \n",result
+#    print type(result)
+    max = 0
+    for distlist in result:
+        
+        for anglist in distlist:
+            if len(anglist)>max:
+                max = len(anglist)
+#    print 'max',max
+#print 'anglist', len(anglist)
+    for distlist in result:
+        for anglist in distlist:
+            while len(anglist)<max:
+                anglist.append(0.0)
+#                print "adding 00"
+#    print "MAAAAX", max
+    
+#    print 'longest', longest(result)
+    return result
+
+def longest(lst):
+#    print "LST", lst
+    if type(lst) is not list:
+#        print "this is not a list"
+        return 0
+#    print "lst", lst
+    max = len(lst)
+#    print "max", max
+    for i in lst:
+#        print "i", i
+        max_i = longest(i)
+        if max_i > max:
+            max = max_i
+#    print "MAX", max
+    return max
+
+def addzeros(lst, max):
+    for l in lst:
+        while len(l)< max:
+            l.append(0.0)
+    return lst
+print "uni2int", uniToInt(iter)
+#print longest(uniToInt(iter))
+#print addzeros(uniToInt(iter), longest(uniToInt(iter)))
