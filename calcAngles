@@ -1,0 +1,92 @@
+
+#*************************************************************************#
+
+# if angle >180
+
+import numpy
+from math import atan2
+co = [(355385, 6689060.0), (355277, 6689010.0), (355501, 6689120.0)]
+A = numpy.array(co[1])
+B = numpy.array(co[0])
+C = numpy.array (co[2])
+
+a = (A - B)
+b = (C - B)
+
+angle = atan2(norm(cross(a,b)), dot(a,b))
+
+#*************************************************************************#
+
+# this way does NOT add up to 360 !
+
+
+import numpy as np
+import math
+
+dict = {(355385,6.68906e+06): [(355277,6.68901e+06), (355501,6.68912e+06), (355364,6.6891e+06), (355277,6.68901e+06)]}
+
+for key, values in dict.iteritems():
+    anglist =[]
+    print key
+    i=0
+    j=1
+    for sides in values[:-1]:
+
+        A = np.array(dict[key][i])
+        B = np.array(key)
+        C = np.array(dict[key][j])
+    
+        BA = A - B
+        BC = C - B
+
+        cosine_angle = np.vdot(BA, BC) / (np.linalg.norm(BA) * np.linalg.norm(BC))
+        angle = (np.degrees(np.arccos(cosine_angle)))
+
+        i+=1
+        j+=1
+
+        print "A=", A
+        print "B=", B
+        print "C=", C
+        
+
+        anglist.append(angle)
+        s = sum(anglist)
+    dict[key]= [values, anglist, s] 
+print dict
+
+#******************************************************************#
+
+# this way NEEDS LOCAL COORDS
+
+import numpy as np
+
+newdict = [[(-107.933482940658, -53.95712820626795), (116.70493412052747, 62.239260295405984), (-21.08988074120134, 39.67334385868162), (-107.933482940658, -53.95712820626795)], [(-102.32048583467258, -53.093695464544), (21.08988074120134, -39.67334385868162), (117.27507484587841, 61.0854503903538), (-23.21418241452193, 45.06675308942795), (-102.32048583467258, -53.093695464544)], [(-102.67854822287336, -54.110022665932775), (23.21418241452193, -45.06675308942795), (111.95323783985805, 60.38951323274523), (-102.67854822287336, -54.110022665932775)]]
+
+def angle_between(p1, p2):
+    ang1 = np.arctan2(*p1[::-1])
+    ang2 = np.arctan2(*p2[::-1])
+    return np.rad2deg((ang1 - ang2) % (2 * np.pi))
+
+
+fullang=[]
+for p in newdict:
+    i=0
+    j=1
+    anglist = []
+    print "p=",p
+    for q in p[:-1]:
+        A=p[i]
+        B=p[j]
+        print "A=",A
+        print "B=", B
+        print "angle=", angle_between(B,A)
+
+        anglist.append(angle_between(B,A))
+        
+        i+=1
+        j+=1
+    anglist.append('total = %d' %sum(anglist))
+    fullang.append(anglist)
+
+print fullang
